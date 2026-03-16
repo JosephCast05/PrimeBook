@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primeview InfoComm 2026 | Appointment Booking</title>
+    <style>
+        :root { --pv-blue: #0056b3; --pv-dark: #1a1a1a; --pv-light: #f4f7f9; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--pv-light); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .card { max-width: 650px; width: 100%; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        header { text-align: center; border-bottom: 3px solid var(--pv-blue); margin-bottom: 30px; padding-bottom: 20px; }
+        h2 { color: var(--pv-blue); margin: 0; text-transform: uppercase; letter-spacing: 1.5px; font-size: 24px; }
+        p { color: #555; font-size: 0.95em; margin-top: 8px; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85em; color: var(--pv-dark); }
+        input, select { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: 0.2s; }
+        input:focus, select:focus { outline: none; border-color: var(--pv-blue); box-shadow: 0 0 8px rgba(0,86,179,0.15); }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        button { 
+            background: var(--pv-blue); color: white; padding: 18px; border: none; border-radius: 8px; 
+            cursor: pointer; font-size: 17px; font-weight: bold; width: 100%; margin-top: 15px;
+            transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,86,179,0.3);
+        }
+        button:hover { background: #003d82; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,86,179,0.4); }
+        button:disabled { background: #abb8c3; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .loader { display: none; text-align: center; margin-top: 15px; font-weight: bold; color: var(--pv-blue); }
+        .required-note { font-size: 0.75em; color: #888; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <header>
+        <h2>Primeview</h2>
+        <p>InfoComm 2026 | Las Vegas | June 17 - 19</p>
+    </header>
+
+    <div class="required-note">* Required fields</div>
+
+    <form id="bookingForm">
+        <div class="grid">
+            <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" id="firstName" placeholder="e.g. John" required>
+            </div>
+            <div class="form-group">
+                <label>Last Name *</label>
+                <input type="text" id="lastName" placeholder="e.g. Smith" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Company Name *</label>
+            <input type="text" id="companyName" placeholder="Your Organization" required>
+        </div>
+
+        <div class="grid">
+            <div class="form-group">
+                <label>Business Email *</label>
+                <input type="email" id="email" placeholder="john@company.com" required>
+            </div>
+            <div class="form-group">
+                <label>Phone Number *</label>
+                <input type="tel" id="phone" placeholder="+1..." required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Region of Interest *</label>
+            <select id="region" onchange="updateRepList()" required>
+                <option value="">Select Region...</option>
+                <option value="USA">USA</option>
+                <option value="ROW">Rest of World (ROW)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Requested Representative (Optional)</label>
+            <select id="requestedRep">
+                <option value="">Any Available</option>
+            </select>
+        </div>
+
+        <div class="grid">
+            <div class="form-group">
+                <label>Date *</label>
+                <input type="date" id="date" min="2026-06-17" max="2026-06-19" required>
+            </div>
+            <div class="form-group">
+                <label>Preferred Time Slot *</label>
+                <select id="timeSlot" required></select>
+            </div>
+        </div>
+
+        <button type="submit" id="submitBtn">Schedule Meeting</button>
+        <div id="loader" class="loader">Verifying availability with server...</div>
+    </form>
+</div>
+
+<script>
+    // --- 1. CONFIGURATION ---
+    // PASTE YOUR GOOGLE WEB APP URL HERE:
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwz_d0NNEtUgFtC7cqFm4SnfRPoWadqRPLw81m0SYfEWUxZiQlIucTxLbq0y5ssm4c/exec';
+
+    const reps = [];
+    // Executives (Global/Both Regions)
+    ["CEO", "CTO", "VP Sales USA", "VP Sales ROW", "CFO", "COO"].forEach(n => reps.push({name: n, region: 'BOTH'}));
+    // AMs (30 USA, 2 ROW)
+    for(let i=1; i<=30; i++) reps.push({name: `AM USA ${i}`, region: 'USA'});
+    for(let i=1; i<=2; i++) reps.push({name: `AM ROW ${i}`, region: 'ROW'});
+
+    // Time Slots (9:00 AM - 4:20 PM, 40-minute intervals)
+    const slots = ["09:00", "09:40", "10:20", "11:00", "11:40", "12:20", "13:00", "13:40", "14:20", "15:00", "15:40", "16:20"];
+    const timeSelect = document.getElementById('timeSlot');
+    slots.forEach(s => timeSelect.add(new Option(s, s)));
+
+    // --- 2. DYNAMIC LOGIC ---
+    function updateRepList() {
+        const region = document.getElementById('region').value;
+        const repDropdown = document.getElementById('requestedRep');
+        repDropdown.innerHTML = '<option value="">Any Available</option>';
+        
+        reps.filter(r => r.region === 'BOTH' || r.region === region).forEach(r => {
+            repDropdown.add(new Option(r.name, r.name));
+        });
+    }
+
+    // --- 3. FORM SUBMISSION ---
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('submitBtn');
+        const loader = document.getElementById('loader');
+        
+        btn.disabled = true;
+        loader.style.display = 'block';
+
+        const payload = {
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value,
+            companyName: document.getElementById('companyName').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            region: document.getElementById('region').value,
+            date: document.getElementById('date').value,
+            time: document.getElementById('timeSlot').value,
+            rep: document.getElementById('requestedRep').value || "Any Available"
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'success') {
+                alert("SUCCESS!\n" + data.message);
+                document.getElementById('bookingForm').reset();
+            } else {
+                alert("BOOKING ERROR:\n" + data.message);
+            }
+        })
+        .catch(err => {
+            alert("Could not connect to the booking server. Please check your internet or try again later.");
+            console.error('Submission Error:', err);
+        })
+        .finally(() => {
+            btn.disabled = false;
+            loader.style.display = 'none';
+        });
+    });
+</script>
+
+</body>
+</html>
