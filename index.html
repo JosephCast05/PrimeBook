@@ -5,93 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Primeview InfoComm 2026 | Appointment Booking</title>
     <style>
-        /* COLOR PALETTE: Red, Black, Gray */
-        :root { 
-            --pv-red: #cc0000; 
-            --pv-black: #111111; 
-            --pv-gray-bg: #e6e6e6; 
-            --pv-gray-light: #f5f5f5;
-            --pv-gray-dark: #555555;
-        }
-        
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background: var(--pv-gray-bg); 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            min-height: 100vh;
-            color: var(--pv-black); 
-        }
-        
-        .card { 
-            max-width: 700px; 
-            width: 100%; 
-            background: #ffffff; 
-            padding: 40px; 
-            border-radius: 8px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            border-top: 6px solid var(--pv-red); 
-            box-sizing: border-box;
-        }
-        
-        /* LOGO & HEADER STYLES */
+        :root { --pv-red: #cc0000; --pv-black: #111111; --pv-gray-bg: #e6e6e6; --pv-gray-light: #f5f5f5; --pv-gray-dark: #555555; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--pv-gray-bg); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--pv-black); }
+        .card { max-width: 700px; width: 100%; background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--pv-red); box-sizing: border-box; }
         header { text-align: center; border-bottom: 1px solid #ccc; margin-bottom: 25px; padding-bottom: 15px; }
         .logo { max-width: 250px; height: auto; display: block; margin: 0 auto 10px auto; }
         p.subtitle { color: var(--pv-gray-dark); margin: 0; font-weight: bold; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px;}
-        
-        /* FORM STYLES */
         .form-group { margin-bottom: 18px; }
         label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.9em; color: var(--pv-black); }
-        input, select { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid #bbb; 
-            border-radius: 4px; 
-            box-sizing: border-box; 
-            font-size: 15px; 
-            background: var(--pv-gray-light); 
-            transition: 0.3s; 
-        }
+        input, select { width: 100%; padding: 12px; border: 1px solid #bbb; border-radius: 4px; box-sizing: border-box; font-size: 15px; background: var(--pv-gray-light); transition: 0.3s; }
         input:focus, select:focus { outline: none; border-color: var(--pv-red); box-shadow: 0 0 5px rgba(204,0,0,0.3); background: #ffffff; }
-        
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        
-        button#submitBtn { 
-            background: var(--pv-red); color: #ffffff; padding: 16px; border: none; border-radius: 4px; 
-            cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 15px; text-transform: uppercase; transition: 0.2s;
-        }
+        button#submitBtn { background: var(--pv-red); color: #ffffff; padding: 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 15px; text-transform: uppercase; transition: 0.2s; }
         button#submitBtn:hover { background: #990000; }
         button:disabled { background: var(--pv-gray-dark); cursor: not-allowed; }
-
-        /* SUGGESTION BOX */
-        #suggestionBox {
-            display: none; margin-top: 25px; padding: 20px; 
-            border: 2px solid var(--pv-red); border-radius: 6px; background: #ffffff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            animation: fadeIn 0.4s ease-in-out;
-        }
+        #suggestionBox { display: none; margin-top: 25px; padding: 20px; border: 2px solid var(--pv-red); border-radius: 6px; background: #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); animation: fadeIn 0.4s ease-in-out; }
         .suggestion-title { font-weight: bold; color: var(--pv-red); margin-bottom: 15px; display: block; font-size: 1.1em; }
-        .suggestion-pill {
-            display: inline-block; background: var(--pv-gray-light); border: 1px solid var(--pv-black); color: var(--pv-black);
-            padding: 10px 18px; border-radius: 25px; margin: 5px 5px 10px 0; cursor: pointer;
-            font-size: 0.9em; font-weight: bold; transition: all 0.2s;
-        }
+        .suggestion-pill { display: inline-block; background: var(--pv-gray-light); border: 1px solid var(--pv-black); color: var(--pv-black); padding: 10px 18px; border-radius: 25px; margin: 5px 5px 10px 0; cursor: pointer; font-size: 0.9em; font-weight: bold; transition: all 0.2s; }
         .suggestion-pill:hover { background: var(--pv-red); color: #ffffff; border-color: var(--pv-red); }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         .loader { display: none; text-align: center; color: var(--pv-red); font-weight: bold; margin-top: 15px; font-style: italic; }
-
-        /* =========================================
-           RESPONSIVE DESIGN (TABLET & MOBILE) 
-           ========================================= */
-        @media (max-width: 768px) {
-            .grid { grid-template-columns: 1fr; gap: 0; }
-            .card { padding: 25px 20px; }
-            .logo { max-width: 200px; }
-        }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 0; } .card { padding: 25px 20px; } .logo { max-width: 200px; } }
     </style>
 </head>
 <body>
@@ -107,59 +41,72 @@
             <div class="form-group"><label>First Name *</label><input type="text" id="firstName" required></div>
             <div class="form-group"><label>Last Name *</label><input type="text" id="lastName" required></div>
         </div>
-        <div class="form-group"><label>Company Name *</label><input type="text" id="companyName" required></div>
+        
+        <div class="grid">
+            <div class="form-group"><label>Company Name *</label><input type="text" id="companyName" required></div>
+            <div class="form-group">
+                <label>Your Role *</label>
+                <select id="clientRole" required>
+                    <option value="">Select Role...</option>
+                    <option value="CEO">CEO / President / Owner</option>
+                    <option value="CFO">CFO / Financial</option>
+                    <option value="CTO">CTO / IT Director</option>
+                    <option value="VP">VP / Executive</option>
+                    <option value="Sales">Sales / Business Dev</option>
+                    <option value="Technical">Technical / Engineer</option>
+                    <option value="Designer">Designer / Architect</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+
         <div class="grid">
             <div class="form-group"><label>Email *</label><input type="email" id="email" required></div>
             <div class="form-group"><label>Phone *</label><input type="tel" id="phone" required></div>
         </div>
-        <div class="form-group">
-            <label>Region *</label>
-            <select id="region" onchange="updateRepList()" required>
-                <option value="">Select Region...</option>
-                <option value="USA">USA</option>
-                <option value="ROW">Rest of World (ROW)</option>
-            </select>
+        
+        <div class="grid">
+            <div class="form-group">
+                <label>Region *</label>
+                <select id="region" required>
+                    <option value="">Select Region...</option>
+                    <option value="USA">USA</option>
+                    <option value="Global">Global</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Department to Meet *</label>
+                <select id="department" required>
+                    <option value="">Select Department...</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Financial">Financial</option>
+                    <option value="Technical">Technical</option>
+                </select>
+            </div>
         </div>
-        <div class="form-group">
-            <label>Requested Representative (Optional)</label>
-            <select id="requestedRep"><option value="">Any Available</option></select>
-        </div>
+
         <div class="grid">
             <div class="form-group"><label>Date *</label><input type="date" id="date" min="2026-06-17" max="2026-06-19" required></div>
             <div class="form-group"><label>Time Slot *</label><select id="timeSlot" required></select></div>
         </div>
 
         <button type="submit" id="submitBtn">Check Availability & Book</button>
-        <div id="loader" class="loader">Processing your request...</div>
+        <div id="loader" class="loader">Verifying schedules...</div>
     </form>
 
     <div id="suggestionBox">
-        <span class="suggestion-title">The requested slot is busy. Please choose an alternative:</span>
+        <span class="suggestion-title">The requested slot is busy for this department. Please choose an alternative:</span>
         <div id="suggestionList"></div>
     </div>
 </div>
 
 <script>
-    // RICORDATI DI INCOLLARE QUI IL TUO URL DI GOOGLE
+    // INCOLLA QUI IL TUO URL
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwz_d0NNEtUgFtC7cqFm4SnfRPoWadqRPLw81m0SYfEWUxZiQlIucTxLbq0y5ssm4c/exec';
-
-    const reps = [];
-    ["CEO", "CTO", "VP Sales USA", "VP Sales ROW", "CFO", "COO"].forEach(n => reps.push({name: n, region: 'BOTH'}));
-    for(let i=1; i<=30; i++) reps.push({name: `AM USA ${i}`, region: 'USA'});
-    for(let i=1; i<=2; i++) reps.push({name: `AM ROW ${i}`, region: 'ROW'});
 
     const slots = ["09:00", "09:40", "10:20", "11:00", "11:40", "12:20", "13:00", "13:40", "14:20", "15:00", "15:40", "16:20"];
     const timeSelect = document.getElementById('timeSlot');
     slots.forEach(s => timeSelect.add(new Option(s, s)));
-
-    function updateRepList() {
-        const region = document.getElementById('region').value;
-        const repDropdown = document.getElementById('requestedRep');
-        repDropdown.innerHTML = '<option value="">Any Available</option>';
-        reps.filter(r => r.region === 'BOTH' || r.region === region).forEach(r => {
-            repDropdown.add(new Option(r.name, r.name));
-        });
-    }
 
     document.getElementById('bookingForm').addEventListener('submit', function(e) {
         if(e) e.preventDefault();
@@ -179,12 +126,13 @@
             firstName: document.getElementById('firstName').value,
             lastName: document.getElementById('lastName').value,
             companyName: document.getElementById('companyName').value,
+            clientRole: document.getElementById('clientRole').value,
             email: document.getElementById('email').value,
             phone: document.getElementById('phone').value,
             region: document.getElementById('region').value,
+            department: document.getElementById('department').value,
             date: document.getElementById('date').value,
-            time: document.getElementById('timeSlot').value,
-            rep: document.getElementById('requestedRep').value || "Any Available"
+            time: document.getElementById('timeSlot').value
         };
 
         fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
@@ -216,17 +164,10 @@
 
         if (suggestions.timeSlots && suggestions.timeSlots.length > 0) {
             suggestions.timeSlots.forEach(time => {
-                createPill(`Keep Rep, change time to ${time}`, () => {
+                createPill(`Available at ${time}`, () => {
                     document.getElementById('timeSlot').value = time;
                     sendBooking();
                 });
-            });
-        }
-
-        if (suggestions.otherRepAvailable) {
-            createPill(`Keep Time, find another available Rep`, () => {
-                document.getElementById('requestedRep').value = ""; 
-                sendBooking();
             });
         }
     }
