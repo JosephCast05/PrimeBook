@@ -9,8 +9,11 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--pv-gray-bg); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--pv-black); }
         .card { max-width: 700px; width: 100%; background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--pv-red); box-sizing: border-box; }
         header { text-align: center; border-bottom: 1px solid #ccc; margin-bottom: 25px; padding-bottom: 15px; }
-        .logo { max-width: 250px; height: auto; display: block; margin: 0 auto 10px auto; }
+        .logo { max-width: 250px; height: auto; display: block; margin: 0 auto 10px auto; transition: 0.2s; }
+        .logo:hover { transform: scale(1.02); }
         p.subtitle { color: var(--pv-gray-dark); margin: 0; font-weight: bold; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px;}
+        .booth-link { display: inline-block; margin-top: 10px; color: var(--pv-red); font-weight: bold; text-decoration: none; font-size: 0.95em; background: #fff0f0; padding: 5px 15px; border-radius: 20px; border: 1px solid #ffcccc; transition: 0.2s;}
+        .booth-link:hover { background: var(--pv-red); color: white; }
         .form-group { margin-bottom: 18px; }
         label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.9em; color: var(--pv-black); }
         input, select { width: 100%; padding: 12px; border: 1px solid #bbb; border-radius: 4px; box-sizing: border-box; font-size: 15px; background: var(--pv-gray-light); transition: 0.3s; }
@@ -19,21 +22,38 @@
         button#submitBtn { background: var(--pv-red); color: #ffffff; padding: 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 15px; text-transform: uppercase; transition: 0.2s; }
         button#submitBtn:hover { background: #990000; }
         button:disabled { background: var(--pv-gray-dark); cursor: not-allowed; }
+        
         #suggestionBox { display: none; margin-top: 25px; padding: 20px; border: 2px solid var(--pv-red); border-radius: 6px; background: #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); animation: fadeIn 0.4s ease-in-out; }
         .suggestion-title { font-weight: bold; color: var(--pv-red); margin-bottom: 15px; display: block; font-size: 1.1em; }
         .suggestion-pill { display: inline-block; background: var(--pv-gray-light); border: 1px solid var(--pv-black); color: var(--pv-black); padding: 10px 18px; border-radius: 25px; margin: 5px 5px 10px 0; cursor: pointer; font-size: 0.9em; font-weight: bold; transition: all 0.2s; }
         .suggestion-pill:hover { background: var(--pv-red); color: #ffffff; border-color: var(--pv-red); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        
         .loader { display: none; text-align: center; color: var(--pv-red); font-weight: bold; margin-top: 15px; font-style: italic; }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 0; } .card { padding: 25px 20px; } .logo { max-width: 200px; } }
+        
+        /* MODAL STYLES */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.3s; }
+        .modal-content { background: white; padding: 40px; border-radius: 8px; max-width: 500px; width: 90%; text-align: center; border-top: 6px solid var(--pv-red); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
+        .modal-content h2 { color: var(--pv-red); margin-top: 0; }
+        .modal-content p { color: var(--pv-black); font-size: 1.1em; line-height: 1.5; margin-bottom: 30px; }
+        .social-links { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .social-links a { text-decoration: none; color: white; background: var(--pv-black); padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 0.9em; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .social-links a:hover { background: var(--pv-red); }
+        .close-modal-btn { background: #ddd; color: #333; border: none; padding: 10px 30px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .close-modal-btn:hover { background: #ccc; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; gap: 0; } .card { padding: 25px 20px; } .logo { max-width: 200px; } .social-links a { width: 100%; justify-content: center; } }
     </style>
 </head>
 <body>
 
 <div class="card">
     <header>
-        <img src="logo.png" alt="Primeview Logo" class="logo">
+        <a href="https://primeviewglobal.com/" target="_blank">
+            <img src="logo.png" alt="Primeview Logo" class="logo">
+        </a>
         <p class="subtitle">InfoComm 2026 | Schedule Your Meeting</p>
+        <a href="https://infocomm26.mapyourshow.com/8_0/exhibitor/exhibitor-details.cfm?exhid=770637" target="_blank" class="booth-link">📍 Where to find us at InfoComm</a>
     </header>
 
     <form id="bookingForm">
@@ -68,7 +88,7 @@
         <div class="grid">
             <div class="form-group">
                 <label>Region *</label>
-                <select id="region" required>
+                <select id="region" onchange="checkRegionDates()" required>
                     <option value="">Select Region...</option>
                     <option value="USA">USA</option>
                     <option value="Global">Global</option>
@@ -86,7 +106,15 @@
         </div>
 
         <div class="grid">
-            <div class="form-group"><label>Date *</label><input type="date" id="date" min="2026-06-17" max="2026-06-19" required></div>
+            <div class="form-group">
+                <label>Date *</label>
+                <select id="date" required>
+                    <option value="">Select Date...</option>
+                    <option value="2026-06-17">June 17, 2026</option>
+                    <option value="2026-06-18">June 18, 2026</option>
+                    <option value="2026-06-19" id="optJune19">June 19, 2026</option>
+                </select>
+            </div>
             <div class="form-group"><label>Time Slot *</label><select id="timeSlot" required></select></div>
         </div>
 
@@ -100,13 +128,46 @@
     </div>
 </div>
 
+<div id="successModal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>🎉 Request Sent!</h2>
+        <p id="modalMessage">Your meeting request has been successfully processed.</p>
+        
+        <div class="social-links">
+            <a href="https://www.linkedin.com/company/primeviewusa/about/" target="_blank">🔗 LinkedIn</a>
+            <a href="mailto:info@primeviewglobal.com">✉️ Email Us</a>
+            <a href="https://primeviewglobal.com/" target="_blank">🌐 Website</a>
+        </div>
+        
+        <button class="close-modal-btn" onclick="closeModal()">Close & Return</button>
+    </div>
+</div>
+
 <script>
-    // INCOLLA QUI IL TUO URL
+    // INCOLLA QUI L'URL DEL TUO NUOVO DEPLOYMENT!
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwz_d0NNEtUgFtC7cqFm4SnfRPoWadqRPLw81m0SYfEWUxZiQlIucTxLbq0y5ssm4c/exec';
 
-    const slots = ["09:00", "09:40", "10:20", "11:00", "11:40", "12:20", "13:00", "13:40", "14:20", "15:00", "15:40", "16:20"];
+    // Genera slot di 30 minuti (20 min meeting + 10 break)
+    const slots = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"];
     const timeSelect = document.getElementById('timeSlot');
     slots.forEach(s => timeSelect.add(new Option(s, s)));
+
+    // Blocca il 19 Giugno se la regione è Global
+    function checkRegionDates() {
+        const region = document.getElementById('region').value;
+        const dateSelect = document.getElementById('date');
+        const optJune19 = document.getElementById('optJune19');
+        
+        if (region === 'Global') {
+            optJune19.disabled = true;
+            if (dateSelect.value === '2026-06-19') {
+                dateSelect.value = ''; // Reset the choice
+                alert("Global representatives are only available on June 17 and 18.");
+            }
+        } else {
+            optJune19.disabled = false;
+        }
+    }
 
     document.getElementById('bookingForm').addEventListener('submit', function(e) {
         if(e) e.preventDefault();
@@ -139,7 +200,8 @@
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
-                alert("SUCCESS!\n" + data.message);
+                document.getElementById('modalMessage').innerText = data.message;
+                document.getElementById('successModal').style.display = 'flex';
                 document.getElementById('bookingForm').reset();
             } 
             else if (data.status === 'busy') {
@@ -178,6 +240,10 @@
         pill.innerText = text;
         pill.onclick = callback;
         document.getElementById('suggestionList').appendChild(pill);
+    }
+
+    function closeModal() {
+        document.getElementById('successModal').style.display = 'none';
     }
 </script>
 
