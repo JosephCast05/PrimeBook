@@ -67,17 +67,20 @@
             <div class="form-group"><label>Company Name *</label><input type="text" id="companyName" required></div>
             <div class="form-group">
                 <label>Your Role *</label>
-                <select id="clientRole" required>
+                <select id="clientRole" onchange="toggleOtherRole()" required>
                     <option value="">Select Role...</option>
                     <option value="CEO">CEO / President / Owner</option>
                     <option value="CFO">CFO / Financial</option>
-                    <option value="CTO">CTO / IT Director</option>
+                    <option value="CTO">CTO / AV Director</option>
                     <option value="VP">VP / Executive</option>
                     <option value="Sales">Sales / Business Dev</option>
                     <option value="Technical">Technical / Engineer</option>
                     <option value="Designer">Designer / Architect</option>
                     <option value="Other">Other</option>
                 </select>
+                <div id="otherRoleContainer" style="display: none; margin-top: 10px; animation: fadeIn 0.3s;">
+                    <input type="text" id="otherRoleInput" placeholder="Specify your role (optional)..." maxlength="50">
+                </div>
             </div>
         </div>
 
@@ -160,6 +163,18 @@
         "Global": ["Itzhak Hachmoun", "Rotem Dror", "Joseph Castelnuovo"]
     };
 
+    // Funzione per mostrare/nascondere il box del ruolo custom
+    function toggleOtherRole() {
+        const role = document.getElementById('clientRole').value;
+        const container = document.getElementById('otherRoleContainer');
+        if (role === 'Other') {
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+            document.getElementById('otherRoleInput').value = ''; 
+        }
+    }
+
     function updateFormLogic() {
         const region = document.getElementById('region').value;
         const dateSelect = document.getElementById('date');
@@ -197,11 +212,20 @@
         loader.style.display = 'block';
         suggBox.style.display = 'none';
 
+        // Gestione del ruolo "Other" con il testo custom
+        let finalRole = document.getElementById('clientRole').value;
+        if (finalRole === 'Other') {
+            const customRole = document.getElementById('otherRoleInput').value.trim();
+            if (customRole) {
+                finalRole = 'Other: ' + customRole;
+            }
+        }
+
         const payload = {
             firstName: document.getElementById('firstName').value,
             lastName: document.getElementById('lastName').value,
             companyName: document.getElementById('companyName').value,
-            clientRole: document.getElementById('clientRole').value,
+            clientRole: finalRole, // Usa il ruolo combinato
             email: document.getElementById('email').value,
             phone: document.getElementById('phone').value,
             region: document.getElementById('region').value,
@@ -218,6 +242,7 @@
                 document.getElementById('modalMessage').innerText = data.message;
                 document.getElementById('successModal').style.display = 'flex';
                 document.getElementById('bookingForm').reset();
+                document.getElementById('otherRoleContainer').style.display = 'none'; // resetta il box custom
             } 
             else if (data.status === 'busy') {
                 showSuggestions(data.suggestions);
