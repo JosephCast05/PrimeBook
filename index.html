@@ -96,7 +96,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Requested Rep (Optional)</label>
+                <label>Contact Person (Optional)</label>
                 <select id="requestedRep">
                     <option value="">Any Available (Auto-assign)</option>
                 </select>
@@ -147,14 +147,14 @@
 </div>
 
 <script>
-    // INCOLLA QUI L'URL DEL TUO NUOVO DEPLOYMENT!
+    // INCOLLA QUI L'URL DEL TUO ULTIMO DEPLOYMENT SCRIPT!
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwz_d0NNEtUgFtC7cqFm4SnfRPoWadqRPLw81m0SYfEWUxZiQlIucTxLbq0y5ssm4c/exec';
 
     const slots = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"];
     const timeSelect = document.getElementById('timeSlot');
     slots.forEach(s => timeSelect.add(new Option(s, s)));
 
-    // Elenco dei Reps per il menu a tendina (Shay ESCLUSO di proposito)
+    // Elenco dei Reps per il menu a tendina
     const repsList = {
         "USA": ["Mike Green", "Brad Tadlock", "Ari Nahar", "Dan Bartley", "Jaime Sucato"],
         "Global": ["Itzhak Hachmoun", "Rotem Dror", "Joseph Castelnuovo"]
@@ -166,7 +166,6 @@
         const optJune19 = document.getElementById('optJune19');
         const repSelect = document.getElementById('requestedRep');
         
-        // 1. Logica Date per i Global
         if (region === 'Global') {
             optJune19.disabled = true;
             if (dateSelect.value === '2026-06-19') {
@@ -177,7 +176,7 @@
             optJune19.disabled = false;
         }
 
-        // 2. Logica popolamento Rep (Senza Shay)
+        // Popola la tendina Contact Person
         repSelect.innerHTML = '<option value="">Any Available (Auto-assign)</option>';
         if (repsList[region]) {
             repsList[region].forEach(r => repSelect.add(new Option(r, r)));
@@ -206,7 +205,7 @@
             email: document.getElementById('email').value,
             phone: document.getElementById('phone').value,
             region: document.getElementById('region').value,
-            requestedRep: document.getElementById('requestedRep').value, // Invia il rep richiesto
+            requestedRep: document.getElementById('requestedRep').value, 
             date: document.getElementById('date').value,
             time: document.getElementById('timeSlot').value,
             comments: document.getElementById('comments').value
@@ -240,20 +239,22 @@
         suggBox.style.display = 'block';
         suggList.innerHTML = '';
 
-        // Suggerimento A: Sposta l'orario per mantenere il Rep
+        // Recupera il nome esatto della Contact Person selezionata
+        const requestedName = document.getElementById('requestedRep').value || "Contact Person";
+
         if (suggestions.timeSlots && suggestions.timeSlots.length > 0) {
             suggestions.timeSlots.forEach(time => {
-                createPill(`Keep Rep, change time to ${time}`, () => {
+                // Genera il bottone col nome della persona desiderata
+                createPill(`Keep ${requestedName}, change time to ${time}`, () => {
                     document.getElementById('timeSlot').value = time;
                     sendBooking();
                 });
             });
         }
 
-        // Suggerimento B: Mantieni orario, auto-assegna a un altro Rep libero
         if (suggestions.otherRepAvailable) {
-            createPill(`Keep Time, find another available Rep`, () => {
-                document.getElementById('requestedRep').value = ""; // Resetta la preferenza
+            createPill(`Keep Time, find another available person`, () => {
+                document.getElementById('requestedRep').value = ""; 
                 sendBooking();
             });
         }
