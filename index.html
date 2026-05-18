@@ -94,7 +94,6 @@
                 <label>Region *</label>
                 <select id="region" onchange="updateFormLogic()" required>
                     <option value="">Select Region...</option>
-                    <option value="USA">USA</option>
                     <option value="Global">Global</option>
                 </select>
             </div>
@@ -109,11 +108,11 @@
         <div class="grid">
             <div class="form-group">
                 <label>Date *</label>
-                <select id="date" required>
+                <select id="date" onchange="updateFormLogic()" required>
                     <option value="">Select Date...</option>
                     <option value="2026-06-17">June 17, 2026</option>
                     <option value="2026-06-18">June 18, 2026</option>
-                    <option value="2026-06-19" id="optJune19">June 19, 2026</option>
+                    <option value="2026-06-19">June 19, 2026</option>
                 </select>
             </div>
             <div class="form-group"><label>Time Slot *</label><select id="timeSlot" required></select></div>
@@ -153,17 +152,13 @@
     // INCOLLA QUI L'URL DEL TUO ULTIMO DEPLOYMENT SCRIPT!
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwz_d0NNEtUgFtC7cqFm4SnfRPoWadqRPLw81m0SYfEWUxZiQlIucTxLbq0y5ssm4c/exec';
 
-    const slots = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"];
-    const timeSelect = document.getElementById('timeSlot');
-    slots.forEach(s => timeSelect.add(new Option(s, s)));
+    const allSlots = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"];
 
-    // Elenco dei Reps per il menu a tendina
-    const repsList = {
-        "USA": ["Mike Green", "Brad Tadlock", "Ari Nahar", "Dan Bartley", "Jaime Sucato"],
-        "Global": ["Itzhak Hachmoun", "Rotem Dror", "Joseph Castelnuovo"]
-    };
+    // Team Global completo per il 17 e 18 giugno
+    const fullGlobalTeam = ["Itzhak Hachmoun", "Rotem Dror", "Joseph Castelnuovo"];
+    // Team Global ridotto richiesto per il 19 giugno
+    const limitedGlobalTeam = ["Rotem Dror", "Joseph Castelnuovo"];
 
-    // Funzione per mostrare/nascondere il box del ruolo custom
     function toggleOtherRole() {
         const role = document.getElementById('clientRole').value;
         const container = document.getElementById('otherRoleContainer');
@@ -177,24 +172,36 @@
 
     function updateFormLogic() {
         const region = document.getElementById('region').value;
-        const dateSelect = document.getElementById('date');
-        const optJune19 = document.getElementById('optJune19');
+        const dateSelect = document.getElementById('date').value;
         const repSelect = document.getElementById('requestedRep');
+        const timeSelect = document.getElementById('timeSlot');
         
+        // 1. GESTIONE DEI COMMERCIALI DISPONIBILI
+        repSelect.innerHTML = '<option value="">Any Available (Auto-assign)</option>';
         if (region === 'Global') {
-            optJune19.disabled = true;
-            if (dateSelect.value === '2026-06-19') {
-                dateSelect.value = ''; 
-                alert("Global representatives are only available on June 17 and 18.");
+            let activeTeam = fullGlobalTeam;
+            // Se è il 19 Giugno, lascia solo Rotem e Joseph
+            if (dateSelect === '2026-06-19') {
+                activeTeam = limitedGlobalTeam;
             }
-        } else {
-            optJune19.disabled = false;
+            activeTeam.forEach(r => repSelect.add(new Option(r, r)));
         }
 
-        // Popola la tendina Contact Person
-        repSelect.innerHTML = '<option value="">Any Available (Auto-assign)</option>';
-        if (repsList[region]) {
-            repsList[region].forEach(r => repSelect.add(new Option(r, r)));
+        // 2. GESTIONE DEGLI ORARI (SLOTS)
+        const currentSelectedTime = timeSelect.value; // Salva la selezione corrente se esiste
+        timeSelect.innerHTML = '';
+        
+        allSlots.forEach(slot => {
+            // Se è il 19 Giugno, interrompi gli slot dopo le 14:30
+            if (dateSelect === '2026-06-19' && slot > "14:30") {
+                return; 
+            }
+            timeSelect.add(new Option(slot, slot));
+        });
+
+        // Ripristina l'orario precedentemente selezionato se è ancora valido, altrimenti resetta
+        if (currentSelectedTime && timeSelect.querySelector(`option[value="${currentSelectedTime}"]`)) {
+            timeSelect.value = currentSelectedTime;
         }
     }
 
@@ -212,7 +219,6 @@
         loader.style.display = 'block';
         suggBox.style.display = 'none';
 
-        // Gestione del ruolo "Other" con il testo custom
         let finalRole = document.getElementById('clientRole').value;
         if (finalRole === 'Other') {
             const customRole = document.getElementById('otherRoleInput').value.trim();
@@ -225,7 +231,7 @@
             firstName: document.getElementById('firstName').value,
             lastName: document.getElementById('lastName').value,
             companyName: document.getElementById('companyName').value,
-            clientRole: finalRole, // Usa il ruolo combinato
+            clientRole: finalRole,
             email: document.getElementById('email').value,
             phone: document.getElementById('phone').value,
             region: document.getElementById('region').value,
@@ -242,7 +248,7 @@
                 document.getElementById('modalMessage').innerText = data.message;
                 document.getElementById('successModal').style.display = 'flex';
                 document.getElementById('bookingForm').reset();
-                document.getElementById('otherRoleContainer').style.display = 'none'; // resetta il box custom
+                document.getElementById('otherRoleContainer').style.display = 'none';
             } 
             else if (data.status === 'busy') {
                 showSuggestions(data.suggestions);
@@ -264,12 +270,15 @@
         suggBox.style.display = 'block';
         suggList.innerHTML = '';
 
-        // Recupera il nome esatto della Contact Person selezionata
         const requestedName = document.getElementById('requestedRep').value || "Contact Person";
 
         if (suggestions.timeSlots && suggestions.timeSlots.length > 0) {
             suggestions.timeSlots.forEach(time => {
-                // Genera il bottone col nome della persona desiderata
+                // Anche nei suggerimenti per il 19 Giugno, non proporre orari oltre le 14:30
+                const dateSelect = document.getElementById('date').value;
+                if (dateSelect === '2026-06-19' && time > "14:30") {
+                    return;
+                }
                 createPill(`Keep ${requestedName}, change time to ${time}`, () => {
                     document.getElementById('timeSlot').value = time;
                     sendBooking();
@@ -296,6 +305,9 @@
     function closeModal() {
         document.getElementById('successModal').style.display = 'none';
     }
+
+    // Inizializza gli orari al primo caricamento della pagina
+    updateFormLogic();
 </script>
 
 </body>
